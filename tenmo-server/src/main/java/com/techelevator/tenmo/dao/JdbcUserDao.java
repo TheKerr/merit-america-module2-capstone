@@ -1,6 +1,8 @@
 package com.techelevator.tenmo.dao;
 
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.security.UserIdNotFoundException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -76,6 +78,30 @@ public class JdbcUserDao implements UserDao {
             return false;
         }
 
+        return true;
+    }
+
+    @Override
+    public BigDecimal getBalance(int id) throws UserIdNotFoundException {
+        String sql = "SELECT balance FROM account JOIN account ON account.user_id = tenmo_user.user_id WHERE user_id = ?";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
+        if(results.next()) {
+            return results.getBigDecimal("balance");
+        }
+        throw new UserIdNotFoundException(id + "is not a valid user id.");
+    }
+
+    @Override
+    public boolean transferTo(Transfer newTransfer) throws UserIdNotFoundException {
+
+        String sqlTransferOut = "UPDATE account SET balance = (SELECT balance - ? FROM account WHERE user_id = ?) WHERE user_id = ?";
+        String sqlTransferIn = "UPDATE account SET balance = (SELECT balance + ? FROM account WHERE user_id = ?) WHERE user_id = ?";
+        try {
+            jdbcTemplate.update(sqlTransferIn, newTransfer.getAmount(), newTransfer.getAccountFrom(), newTransfer.getAccountFrom());
+            jdbcTemplate.update(sqlTransferOut, newTransfer.getAmount(), newTransfer.getAccountTo(), newTransfer.getAccountTo());
+        } catch (DataAccessException e) {
+            return false;
+        }
         return true;
     }
 
