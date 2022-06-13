@@ -1,9 +1,16 @@
 package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
+import com.techelevator.tenmo.services.UserService;
+
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.List;
 
 public class App {
 
@@ -11,6 +18,8 @@ public class App {
 
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
+    private final UserService userService = new UserService(API_BASE_URL);
+    NumberFormat currency = NumberFormat.getCurrencyInstance();
 
     private AuthenticatedUser currentUser;
 
@@ -85,8 +94,9 @@ public class App {
     }
 
 	private void viewCurrentBalance() {
-		// TODO Auto-generated method stub
-		
+        System.out.println("Your current balance is: ");
+        BigDecimal balance = userService.getBalance(currentUser);
+        System.out.println(currency.format(balance));
 	}
 
 	private void viewTransferHistory() {
@@ -100,7 +110,37 @@ public class App {
 	}
 
 	private void sendBucks() {
-		// TODO Auto-generated method stub
+        List<User> tenmoUsers = userService.findAll(currentUser);
+        for (User user: tenmoUsers) {
+            System.out.println(user);
+        }
+        boolean validSelection = false;
+        int transferId = 0;
+        while(validSelection == false) {
+            transferId = consoleService.promptForInt("If you wish to abort this action, enter -1. Please select the user id you wish to send Bucks to: ");
+            if (transferId == currentUser.getUser().getId()) {
+                System.out.println("Invalid recipient, please enter a different id.");
+                continue;
+            }
+            for(User users : tenmoUsers) {
+                if(transferId == users.getId()) {
+                    validSelection = true;
+                    break;
+                }
+            }
+            if (transferId == -1) {
+                return;
+            }
+        }
+        BigDecimal transferAmount = consoleService.promptForBigDecimal("Please enter the amount you wish to transfer: ");
+        if(userService.getBalance(currentUser).compareTo(transferAmount) > -1) {
+            Transfer newTransfer = new Transfer();
+            newTransfer.setFromId(currentUser.getUser().getId());
+            newTransfer.setToId((long) transferId);
+            newTransfer.setStatusId(2);
+            newTransfer.setAmount(transferAmount);
+            newTransfer.setTypeId(2);
+        }
 		
 	}
 

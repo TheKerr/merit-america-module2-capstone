@@ -1,0 +1,7 @@
+2022-06-12T18:37:30.1968881 500 : [{"timestamp":"2022-06-12T22:37:30.187+00:00","status":500,"error":"Internal Server Error","message":"Missing URI template variable 'id' for method parameter of type int","path":"/1001"}]
+2022-06-12T18:40:46.9939429 500 : [{"timestamp":"2022-06-12T22:40:41.814+00:00","status":500,"error":"Internal Server Error","message":"Missing URI template variable 'id' for method parameter of type int","path":"/1001"}]
+2022-06-12T18:45:21.7597159 500 : [{"timestamp":"2022-06-12T22:45:21.750+00:00","status":500,"error":"Internal Server Error","message":"Missing URI template variable 'id' for method parameter of type int","path":"/1001"}]
+2022-06-12T18:52:35.1329523 401 : [{"timestamp":"2022-06-12T22:52:35.117+00:00","status":401,"error":"Unauthorized","message":"Full authentication is required to access this resource","path":"/1001"}]
+2022-06-12T18:53:19.933785 401 : [{"timestamp":"2022-06-12T22:53:19.922+00:00","status":401,"error":"Unauthorized","message":"Full authentication is required to access this resource","path":"/1001"}]
+2022-06-12T19:08:49.6296242 401 : [{"timestamp":"2022-06-12T23:08:49.617+00:00","status":401,"error":"Unauthorized","message":"Full authentication is required to access this resource","path":"/account/1001"}]
+2022-06-12T19:19:56.2235597 401 : [{"timestamp":"2022-06-12T23:19:56.211+00:00","status":401,"error":"Unauthorized","message":"Full authentication is required to access this resource","path":"/account/1001"}]

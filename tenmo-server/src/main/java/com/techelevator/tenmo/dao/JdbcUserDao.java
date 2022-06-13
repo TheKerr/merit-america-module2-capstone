@@ -83,7 +83,7 @@ public class JdbcUserDao implements UserDao {
 
     @Override
     public BigDecimal getBalance(int id) throws UserIdNotFoundException {
-        String sql = "SELECT balance FROM account JOIN account ON account.user_id = tenmo_user.user_id WHERE user_id = ?";
+        String sql = "SELECT balance FROM account JOIN tenmo_user ON account.user_id = tenmo_user.user_id WHERE tenmo_user.user_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
         if(results.next()) {
             return results.getBigDecimal("balance");
