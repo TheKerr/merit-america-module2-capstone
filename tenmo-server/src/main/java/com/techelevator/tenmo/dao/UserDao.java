@@ -19,4 +19,6 @@ public interface UserDao {
     BigDecimal getBalance(int id);
 
     boolean transferTo(Transfer newTransfer);
+
+    List<Transfer> getHistory(int id);
 }

@@ -10,6 +10,7 @@ import com.techelevator.tenmo.services.UserService;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class App {
@@ -64,6 +65,7 @@ public class App {
     private void handleLogin() {
         UserCredentials credentials = consoleService.promptForCredentials();
         currentUser = authenticationService.login(credentials);
+        userService.setUser(currentUser);
         if (currentUser == null) {
             consoleService.printErrorMessage();
         }
@@ -95,13 +97,16 @@ public class App {
 
 	private void viewCurrentBalance() {
         System.out.println("Your current balance is: ");
-        BigDecimal balance = userService.getBalance(currentUser);
+        BigDecimal balance = userService.getBalance();
         System.out.println(currency.format(balance));
 	}
 
 	private void viewTransferHistory() {
-		// TODO Auto-generated method stub
-		
+        List<Transfer> userTransfers = userService.getTransferHistory();
+        System.out.println("-----------------------------");
+        System.out.println("Transfers");
+        System.out.println("ID      From/To        Amount");
+        System.out.println();
 	}
 
 	private void viewPendingRequests() {
@@ -110,7 +115,7 @@ public class App {
 	}
 
 	private void sendBucks() {
-        List<User> tenmoUsers = userService.findAll(currentUser);
+        List<User> tenmoUsers = userService.findAll();
         for (User user: tenmoUsers) {
             System.out.println(user);
         }
@@ -133,15 +138,24 @@ public class App {
             }
         }
         BigDecimal transferAmount = consoleService.promptForBigDecimal("Please enter the amount you wish to transfer: ");
-        if(userService.getBalance(currentUser).compareTo(transferAmount) > -1) {
-            Transfer newTransfer = new Transfer();
+        Transfer newTransfer = new Transfer();
+        if(userService.getBalance().compareTo(transferAmount) > -1 && transferAmount.compareTo(BigDecimal.valueOf(0)) > -1) {
             newTransfer.setFromId(currentUser.getUser().getId());
             newTransfer.setToId((long) transferId);
             newTransfer.setStatusId(2);
             newTransfer.setAmount(transferAmount);
             newTransfer.setTypeId(2);
         }
-		
+        else {
+            System.out.println("Invalid amount. Please enter a valid amount to transfer.");
+            return;
+        }
+        boolean completed = false;
+        completed = userService.transfer(newTransfer);
+		if (completed == true) {
+            System.out.println("Transfer completed.");
+        }
+        else System.out.println("Transfer has failed.");
 	}
 
 	private void requestBucks() {

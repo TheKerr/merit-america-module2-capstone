@@ -27,9 +27,11 @@ public class AccountController {
         return this.userDao.findAll();
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = "transfer", method = RequestMethod.POST)
     public boolean transfer(@Valid @RequestBody Transfer newTransfer) {
         return this.userDao.transferTo(newTransfer);
     }
 
+    @RequestMapping(value = "transfer/history", method = RequestMethod.GET)
+    public List<Transfer> getTransferHistory(@RequestParam int currentUserId) { return this.userDao.getHistory(currentUserId); }
 }

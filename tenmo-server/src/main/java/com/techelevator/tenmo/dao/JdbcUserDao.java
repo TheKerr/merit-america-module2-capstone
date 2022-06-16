@@ -93,16 +93,35 @@ public class JdbcUserDao implements UserDao {
 
     @Override
     public boolean transferTo(Transfer newTransfer) throws UserIdNotFoundException {
-
+        String sqlInsertTransfer = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (2, 2, ?, ?, ?)";
         String sqlTransferOut = "UPDATE account SET balance = (SELECT balance - ? FROM account WHERE user_id = ?) WHERE user_id = ?";
         String sqlTransferIn = "UPDATE account SET balance = (SELECT balance + ? FROM account WHERE user_id = ?) WHERE user_id = ?";
         try {
+            jdbcTemplate.update(sqlInsertTransfer, newTransfer.getAccountFrom(), newTransfer.getAccountTo(), newTransfer.getAmount());
             jdbcTemplate.update(sqlTransferIn, newTransfer.getAmount(), newTransfer.getAccountFrom(), newTransfer.getAccountFrom());
             jdbcTemplate.update(sqlTransferOut, newTransfer.getAmount(), newTransfer.getAccountTo(), newTransfer.getAccountTo());
         } catch (DataAccessException e) {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public List<Transfer> getHistory(int id) throws UserIdNotFoundException {
+        List<Transfer> newTransfer = new ArrayList<>();
+        try {
+            String sql = "SELECT transfer_id, transfer_type_id, transfer_status_id, amount, tenmo_user.username AS from_name FROM transfer JOIN account ON transfer.account_from = account.account_id JOIN tenmo_user ON tenmo_user.user_id = account.user_id WHERE user_id = ? UNION " +
+                    "SELECT transfer_id, transfer_type_id, transfer_status_id, amount, tenmo_user.username AS to_name FROM transfer JOIN account ON transfer.account_to = account.account_id JOIN tenmo_user ON tenmo_user.user_id = account.user_id WHERE user_id = ? ORDER BY transfer_id";
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id, id);
+
+            while (results.next()) {
+                newTransfer.add(mapRowToTransfer(results));
+            }
+        }
+        catch (UserIdNotFoundException | DataAccessException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return newTransfer;
     }
 
     private User mapRowToUser(SqlRowSet rs) {
@@ -113,5 +132,16 @@ public class JdbcUserDao implements UserDao {
         user.setActivated(true);
         user.setAuthorities("USER");
         return user;
+    }
+
+    private Transfer mapRowToTransfer(SqlRowSet rs) {
+        Transfer transfer = new Transfer();
+        transfer.setTransferId(rs.getInt("transfer_id"));
+        transfer.setTransferTypeId(rs.getInt("transfer_type_id"));
+        transfer.setTransferStatusId(rs.getInt("transfer_status_id"));
+        transfer.setAmount(rs.getBigDecimal("amount"));
+        transfer.setFromName(rs.getString("from_name"));
+        transfer.setToName(rs.getString("to_name"));
+        return transfer;
     }
 }

@@ -20,6 +20,11 @@ public class Transfer {
     int transferStatusId;
     @Min(1)
     BigDecimal amount;
+    String fromName;
+    String toName;
+
+    public Transfer() {
+    }
 
     public Transfer(int transferId, int accountTo, int accountFrom, int transferTypeId, int transferStatusId, BigDecimal amount) {
         this.transferId = transferId;
@@ -78,4 +83,19 @@ public class Transfer {
         return amount;
     }
 
+    public String getFromName() {
+        return fromName;
+    }
+
+    public void setFromName(String fromName) {
+        this.fromName = fromName;
+    }
+
+    public String getToName() {
+        return toName;
+    }
+
+    public void setToName(String toName) {
+        this.toName = toName;
+    }
 }

@@ -9,6 +9,11 @@ public class Transfer {
     private Long toId;
     private int typeId;
     private BigDecimal amount;
+    private String fromName;
+    private String toName;
+
+    public Transfer() {
+    }
 
     public Long getAccountId() {
         return transferId;
@@ -56,5 +61,21 @@ public class Transfer {
 
     public void setTypeId(int typeId) {
         this.typeId = typeId;
+    }
+
+    public String getFromName() {
+        return fromName;
+    }
+
+    public void setFromName(String fromName) {
+        this.fromName = fromName;
+    }
+
+    public String getToName() {
+        return toName;
+    }
+
+    public void setToName(String toName) {
+        this.toName = toName;
     }
 }
