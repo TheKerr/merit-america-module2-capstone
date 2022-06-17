@@ -106,7 +106,14 @@ public class App {
         System.out.println("-----------------------------");
         System.out.println("Transfers");
         System.out.println("ID      From/To        Amount");
-        System.out.println();
+        for(Transfer transfers : userTransfers) {
+            System.out.print(transfers.getTransferId() + " \t");
+            if(transfers.getAccountFrom() == currentUser.getUser().getId()) {
+                System.out.print(transfers.getToName() + " \t \t");
+            }
+            else System.out.print(transfers.getFromName() + " \t \t");
+            System.out.print(transfers.getAmount() + "\n");
+        }
 	}
 
 	private void viewPendingRequests() {
@@ -116,9 +123,14 @@ public class App {
 
 	private void sendBucks() {
         List<User> tenmoUsers = userService.findAll();
+        System.out.println("----------------------");
+        System.out.println("Users");
+        System.out.println("ID \t \t Name");
+        System.out.println("----------------------");
         for (User user: tenmoUsers) {
-            System.out.println(user);
+            System.out.println(user.getId() + "\t" + user.getUsername());
         }
+        System.out.println("-----------");
         boolean validSelection = false;
         int transferId = 0;
         while(validSelection == false) {
@@ -140,8 +152,8 @@ public class App {
         BigDecimal transferAmount = consoleService.promptForBigDecimal("Please enter the amount you wish to transfer: ");
         Transfer newTransfer = new Transfer();
         if(userService.getBalance().compareTo(transferAmount) > -1 && transferAmount.compareTo(BigDecimal.valueOf(0)) > -1) {
-            newTransfer.setFromId(currentUser.getUser().getId());
-            newTransfer.setToId((long) transferId);
+            newTransfer.setAccountFrom(currentUser.getUser().getId());
+            newTransfer.setAccountTo((long) transferId);
             newTransfer.setStatusId(2);
             newTransfer.setAmount(transferAmount);
             newTransfer.setTypeId(2);

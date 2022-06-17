@@ -1,9 +1,14 @@
 package com.techelevator.tenmo.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class User {
 
     private Long id;
     private String username;
+    private String password;
+    private boolean activated;
 
     public Long getId() {
         return id;

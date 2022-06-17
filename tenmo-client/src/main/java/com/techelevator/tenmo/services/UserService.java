@@ -56,8 +56,8 @@ public class UserService {
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(user.getToken());
             HttpEntity<AuthenticatedUser> entity = new HttpEntity<>(headers);
-            ResponseEntity<List> response = restTemplate.exchange(baseUrl + "account/getAll?currentUserId=" + user.getUser().getId(), HttpMethod.GET, entity, List.class);
-            allUsers = response.getBody();
+            ResponseEntity<User[]> response = restTemplate.exchange(baseUrl + "account/getAll?currentUserId=" + user.getUser().getId(), HttpMethod.GET, entity, User[].class);
+            allUsers = List.of(response.getBody());
         }
         catch (RestClientResponseException | ResourceAccessException e) {
             BasicLogger.log(e.getMessage());
@@ -86,8 +86,8 @@ public class UserService {
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(user.getToken());
             HttpEntity<AuthenticatedUser> entity = new HttpEntity<>(headers);
-            ResponseEntity<List> response = restTemplate.exchange(baseUrl + "transfer/history?currentUserId=" + user.getUser().getId(), HttpMethod.GET, entity, List.class);
-            transferHistory = response.getBody();
+            ResponseEntity<Transfer[]> response = restTemplate.exchange(baseUrl + "transfer/history?currentUserId=" + user.getUser().getId(), HttpMethod.GET, entity, Transfer[].class);
+            transferHistory = List.of(response.getBody());
         }
         catch (RestClientResponseException | ResourceAccessException e) {
             BasicLogger.log(e.getMessage());

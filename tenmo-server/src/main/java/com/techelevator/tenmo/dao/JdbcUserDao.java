@@ -93,13 +93,14 @@ public class JdbcUserDao implements UserDao {
 
     @Override
     public boolean transferTo(Transfer newTransfer) throws UserIdNotFoundException {
-        String sqlInsertTransfer = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (2, 2, ?, ?, ?)";
+        String sqlInsertTransfer = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (2, 2, " +
+                "(SELECT account_id FROM account WHERE user_id = ?), (SELECT account_id FROM account WHERE user_id = ?), ?)";
         String sqlTransferOut = "UPDATE account SET balance = (SELECT balance - ? FROM account WHERE user_id = ?) WHERE user_id = ?";
         String sqlTransferIn = "UPDATE account SET balance = (SELECT balance + ? FROM account WHERE user_id = ?) WHERE user_id = ?";
         try {
             jdbcTemplate.update(sqlInsertTransfer, newTransfer.getAccountFrom(), newTransfer.getAccountTo(), newTransfer.getAmount());
-            jdbcTemplate.update(sqlTransferIn, newTransfer.getAmount(), newTransfer.getAccountFrom(), newTransfer.getAccountFrom());
-            jdbcTemplate.update(sqlTransferOut, newTransfer.getAmount(), newTransfer.getAccountTo(), newTransfer.getAccountTo());
+            jdbcTemplate.update(sqlTransferIn, newTransfer.getAmount(), newTransfer.getAccountTo(), newTransfer.getAccountTo());
+            jdbcTemplate.update(sqlTransferOut, newTransfer.getAmount(), newTransfer.getAccountFrom(), newTransfer.getAccountFrom());
         } catch (DataAccessException e) {
             return false;
         }
@@ -110,8 +111,8 @@ public class JdbcUserDao implements UserDao {
     public List<Transfer> getHistory(int id) throws UserIdNotFoundException {
         List<Transfer> newTransfer = new ArrayList<>();
         try {
-            String sql = "SELECT transfer_id, transfer_type_id, transfer_status_id, amount, tenmo_user.username AS from_name FROM transfer JOIN account ON transfer.account_from = account.account_id JOIN tenmo_user ON tenmo_user.user_id = account.user_id WHERE user_id = ? UNION " +
-                    "SELECT transfer_id, transfer_type_id, transfer_status_id, amount, tenmo_user.username AS to_name FROM transfer JOIN account ON transfer.account_to = account.account_id JOIN tenmo_user ON tenmo_user.user_id = account.user_id WHERE user_id = ? ORDER BY transfer_id";
+            String sql = "SELECT transfer_id, transfer_type_id, transfer_status_id, amount, tenmo_user.username AS from_name, '' AS to_name FROM transfer JOIN account ON transfer.account_from = account.account_id JOIN tenmo_user ON tenmo_user.user_id = account.user_id WHERE tenmo_user.user_id = ? UNION " +
+                    "SELECT transfer_id, transfer_type_id, transfer_status_id, amount, tenmo_user.username AS to_name, '' AS from_name FROM transfer JOIN account ON transfer.account_to = account.account_id JOIN tenmo_user ON tenmo_user.user_id = account.user_id WHERE tenmo_user.user_id = ? ORDER BY transfer_id";
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id, id);
 
             while (results.next()) {

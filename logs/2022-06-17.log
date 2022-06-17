@@ -1,0 +1,3 @@
+2022-06-17T16:53:20.5550984 401 : [no body]
+2022-06-17T17:12:50.9150498 400 : [{"timestamp":"2022-06-17T21:12:50.899+00:00","status":400,"error":"Bad Request","message":"Validation failed for object='transfer'. Error count: 2","errors":[{"codes":["Min.transfer.accountTo","Min.ac... (886 bytes)]
+2022-06-17T17:14:39.4764109 400 : [{"timestamp":"2022-06-17T21:14:39.474+00:00","status":400,"error":"Bad Request","message":"Validation failed for object='transfer'. Error count: 2","errors":[{"codes":["Min.transfer.accountFrom","Min.... (886 bytes)]

@@ -12,13 +12,13 @@ public class Transfer {
     final int TRANSFER_STATUS_REJECTED = 3;
 
     int transferId;
-    @Min(1)
+    @Min(0)
     int accountTo;
-    @Min(1)
+    @Min(0)
     int accountFrom;
     int transferTypeId;
     int transferStatusId;
-    @Min(1)
+    @Min(0)
     BigDecimal amount;
     String fromName;
     String toName;
