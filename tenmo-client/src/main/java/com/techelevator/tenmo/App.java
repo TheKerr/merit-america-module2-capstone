@@ -101,18 +101,48 @@ public class App {
         System.out.println(currency.format(balance));
 	}
 
+    private void viewTransferList(List<Transfer> transfer) {
+        System.out.println("----------------------------------");
+        System.out.println("Transfers");
+        System.out.println("ID      From/To         Amount");
+        System.out.println("----------------------------------");
+        for(Transfer transfers : transfer) {
+            System.out.print(transfers.getTransferId() + " \t");
+            if(transfers.getFromName().equals(currentUser.getUser().getUsername())) {
+                System.out.print("To: " + transfers.getToName() + " \t \t");
+            }
+            else System.out.print("From: " + transfers.getFromName() + " \t \t");
+            System.out.print(currency.format(transfers.getAmount()) + "\n");
+        }
+    }
+
 	private void viewTransferHistory() {
         List<Transfer> userTransfers = userService.getTransferHistory();
-        System.out.println("-----------------------------");
-        System.out.println("Transfers");
-        System.out.println("ID      From/To        Amount");
-        for(Transfer transfers : userTransfers) {
-            System.out.print(transfers.getTransferId() + " \t");
-            if(transfers.getAccountFrom() == currentUser.getUser().getId()) {
-                System.out.print(transfers.getToName() + " \t \t");
+        int transferId = 0;
+        while (true) {
+            viewTransferList(userTransfers);
+            System.out.println("");
+            transferId = consoleService.promptForInt("Please enter the Transfer ID that you would like to see details of (0 to cancel): ");
+            System.out.println("");
+            if(transferId == 0) {
+                break;
             }
-            else System.out.print(transfers.getFromName() + " \t \t");
-            System.out.print(transfers.getAmount() + "\n");
+            for(Transfer transfer : userTransfers) {
+                if(transfer.getTransferId() == transferId) {
+                    System.out.println("");
+                    System.out.println("---------------------------");
+                    System.out.println("Transfer Details");
+                    System.out.println("---------------------------");
+                    System.out.println("ID: " + transfer.getTransferId());
+                    System.out.println("From: " + transfer.getFromName());
+                    System.out.println("To: " + transfer.getToName());
+                    System.out.println("Type: " + transfer.getTypeName());
+                    System.out.println("Status: " + transfer.getStatusName());
+                    System.out.println("Amount: " + currency.format(transfer.getAmount()));
+                    consoleService.pause();
+                    break;
+                }
+            }
         }
 	}
 
@@ -134,7 +164,7 @@ public class App {
         boolean validSelection = false;
         int transferId = 0;
         while(validSelection == false) {
-            transferId = consoleService.promptForInt("If you wish to abort this action, enter -1. Please select the user id you wish to send Bucks to: ");
+            transferId = consoleService.promptForInt("Please select the user id you wish to send Bucks to (-1 to abort): ");
             if (transferId == currentUser.getUser().getId()) {
                 System.out.println("Invalid recipient, please enter a different id.");
                 continue;

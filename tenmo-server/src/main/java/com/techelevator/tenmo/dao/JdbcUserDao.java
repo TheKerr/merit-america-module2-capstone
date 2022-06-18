@@ -111,8 +111,22 @@ public class JdbcUserDao implements UserDao {
     public List<Transfer> getHistory(int id) throws UserIdNotFoundException {
         List<Transfer> newTransfer = new ArrayList<>();
         try {
-            String sql = "SELECT transfer_id, transfer_type_id, transfer_status_id, amount, tenmo_user.username AS from_name, '' AS to_name FROM transfer JOIN account ON transfer.account_from = account.account_id JOIN tenmo_user ON tenmo_user.user_id = account.user_id WHERE tenmo_user.user_id = ? UNION " +
-                    "SELECT transfer_id, transfer_type_id, transfer_status_id, amount, tenmo_user.username AS to_name, '' AS from_name FROM transfer JOIN account ON transfer.account_to = account.account_id JOIN tenmo_user ON tenmo_user.user_id = account.user_id WHERE tenmo_user.user_id = ? ORDER BY transfer_id";
+            String sql = "SELECT transfer_id, transfer_type_id, transfer_status_id, amount, to_user.username AS to_name, from_user.username AS from_name\n" +
+                    "FROM transfer \n" +
+                    "    JOIN account AS from_account ON transfer.account_from = from_account.account_id \n" +
+                    "    JOIN tenmo_user AS from_user ON from_user.user_id = from_account.user_id \n" +
+                    "    JOIN account AS to_account ON transfer.account_to = to_account.account_id\n" +
+                    "    JOIN tenmo_user AS to_user ON to_user.user_id = to_account.user_id\n" +
+                    "WHERE from_user.user_id = ? \n" +
+                    "UNION \n" +
+                    "SELECT transfer_id, transfer_type_id, transfer_status_id, amount, to_user.username AS to_name, from_user.username AS from_name\n" +
+                    "FROM transfer \n" +
+                    "    JOIN account AS from_account ON transfer.account_from = from_account.account_id \n" +
+                    "    JOIN tenmo_user AS from_user ON from_user.user_id = from_account.user_id \n" +
+                    "    JOIN account AS to_account ON transfer.account_to = to_account.account_id\n" +
+                    "    JOIN tenmo_user AS to_user ON to_user.user_id = to_account.user_id\n" +
+                    "WHERE to_user.user_id = ? \n" +
+                    "ORDER BY transfer_id";
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id, id);
 
             while (results.next()) {
@@ -138,8 +152,8 @@ public class JdbcUserDao implements UserDao {
     private Transfer mapRowToTransfer(SqlRowSet rs) {
         Transfer transfer = new Transfer();
         transfer.setTransferId(rs.getInt("transfer_id"));
-        transfer.setTransferTypeId(rs.getInt("transfer_type_id"));
-        transfer.setTransferStatusId(rs.getInt("transfer_status_id"));
+        transfer.setTypeId(rs.getInt("transfer_type_id"));
+        transfer.setStatusId(rs.getInt("transfer_status_id"));
         transfer.setAmount(rs.getBigDecimal("amount"));
         transfer.setFromName(rs.getString("from_name"));
         transfer.setToName(rs.getString("to_name"));

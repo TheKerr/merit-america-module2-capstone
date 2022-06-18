@@ -3,6 +3,13 @@ package com.techelevator.tenmo.model;
 import java.math.BigDecimal;
 
 public class Transfer {
+
+    final int TRANSFER_TYPE_REQUEST = 1;
+    final int TRANSFER_TYPE_SEND = 2;
+    final int TRANSFER_STATUS_PENDING = 1;
+    final int TRANSFER_STATUS_APPROVED = 2;
+    final int TRANSFER_STATUS_REJECTED = 3;
+
     private Long transferId;
     private int statusId;
     private Long accountFrom;
@@ -23,8 +30,17 @@ public class Transfer {
         this.transferId = transferId;
     }
 
-    public int getStatusId() {
-        return statusId;
+    public String getStatusName() {
+        if(statusId == TRANSFER_STATUS_PENDING) {
+            return "Pending";
+        }
+        else if(statusId == TRANSFER_STATUS_APPROVED) {
+            return "Approved";
+        }
+        else if(statusId == TRANSFER_STATUS_REJECTED) {
+            return "Rejected";
+        }
+        return "";
     }
 
     public void setStatusId(int statusId) {
@@ -55,8 +71,14 @@ public class Transfer {
         this.amount = amount;
     }
 
-    public int getTypeId() {
-        return typeId;
+    public String getTypeName() {
+        if(typeId == TRANSFER_TYPE_REQUEST) {
+            return "Request";
+        }
+        else if (typeId == TRANSFER_TYPE_SEND) {
+            return "Send";
+        }
+        return "";
     }
 
     public void setTypeId(int typeId) {
