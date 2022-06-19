@@ -102,17 +102,16 @@ public class App {
 	}
 
     private void viewTransferList(List<Transfer> transfer) {
-        System.out.println("----------------------------------");
+        System.out.println("-------------------------------------------");
         System.out.println("Transfers");
-        System.out.println("ID      From/To         Amount");
-        System.out.println("----------------------------------");
+        System.out.println("ID      From/To      Status     Amount");
+        System.out.println("-------------------------------------------");
         for(Transfer transfers : transfer) {
-            System.out.print(transfers.getTransferId() + " \t");
+            System.out.print(transfers.getTransferId() + "  \t");
             if(transfers.getFromName().equals(currentUser.getUser().getUsername())) {
-                System.out.print("To: " + transfers.getToName() + " \t \t");
+                System.out.print("To: " + transfers.getToName() + "  \t " + transfers.getStatusName() + "  \t" + currency.format(transfers.getAmount()) + "\n");
             }
-            else System.out.print("From: " + transfers.getFromName() + " \t \t");
-            System.out.print(currency.format(transfers.getAmount()) + "\n");
+            else System.out.print("From: " + transfers.getFromName() + "  \t " + transfers.getStatusName() + "  \t" + currency.format(transfers.getAmount()) + "\n");
         }
     }
 
@@ -147,12 +146,49 @@ public class App {
 	}
 
 	private void viewPendingRequests() {
-		// TODO Auto-generated method stub
-		
+        List<Transfer> pendingTransfers = userService.getPendingRequests();
+        int transferId = 0;
+        while(true) {
+            System.out.println("-----------------------------------");
+            System.out.println("Pending Transfers");
+            System.out.println("ID      To         Amount");
+            System.out.println("-----------------------------------");
+            for(Transfer transfer : pendingTransfers) {
+                System.out.print(transfer.getTransferId() +" \t" + transfer.getToName()+ "\t \t   " + currency.format(transfer.getAmount()));
+                System.out.println("");
+            }
+            System.out.println("");
+            transferId = consoleService.promptForInt("Please enter the transfer ID that you would like to approve/reject (0 to cancel): ");
+            if (transferId == 0) {
+                break;
+            }
+            int choice = 0;
+            Transfer pendingTransfer = getTransferById(pendingTransfers, transferId);
+            if(pendingTransfer != null) {
+                System.out.println("1: Approve");
+                System.out.println("2: Reject");
+                System.out.println("0: Don't approve or reject");
+                System.out.println("------------------------------");
+                choice = consoleService.promptForInt("Please choose an option: ");
+                System.out.println("");
+                if(choice > 2 || choice < 0) {
+                    System.out.println("Invalid selection, please try again.");
+                }
+                else {
+                    pendingTransfer.setStatusId(choice + 1);
+                    boolean success = userService.updatePending(pendingTransfer);
+                    if (success) {
+                        System.out.println("Transfer has been updated.");
+                        break;
+                    }
+                    else System.out.println("Transfer failed to update.");
+                }
+            }
+            else System.out.println("Invalid transfer selection.");
+        }
 	}
 
-	private void sendBucks() {
-        List<User> tenmoUsers = userService.findAll();
+    private void viewListOfUsers(List<User> tenmoUsers) {
         System.out.println("----------------------");
         System.out.println("Users");
         System.out.println("ID \t \t Name");
@@ -161,21 +197,19 @@ public class App {
             System.out.println(user.getId() + "\t" + user.getUsername());
         }
         System.out.println("-----------");
+    }
+
+	private void sendBucks() {
+        List<User> tenmoUsers = userService.findAll();
+        viewListOfUsers(tenmoUsers);
         boolean validSelection = false;
         int transferId = 0;
         while(validSelection == false) {
-            transferId = consoleService.promptForInt("Please select the user id you wish to send Bucks to (-1 to abort): ");
-            if (transferId == currentUser.getUser().getId()) {
-                System.out.println("Invalid recipient, please enter a different id.");
-                continue;
+            transferId = consoleService.promptForInt("Please select the user id you wish to send Bucks to (0 to abort): ");
+            if(checkValidId(tenmoUsers, transferId)) {
+                validSelection = true;
             }
-            for(User users : tenmoUsers) {
-                if(transferId == users.getId()) {
-                    validSelection = true;
-                    break;
-                }
-            }
-            if (transferId == -1) {
+            if (transferId == 0) {
                 return;
             }
         }
@@ -200,9 +234,70 @@ public class App {
         else System.out.println("Transfer has failed.");
 	}
 
+    private boolean checkValidId(List<User> tenmoUsers, int id){
+        if (id == currentUser.getUser().getId()) {
+            System.out.println("Invalid user, please enter a different id.");
+            return false;
+        }
+        for(User users : tenmoUsers) {
+            if(id == users.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Transfer getTransferById(List<Transfer> transfers, int id){
+        for(Transfer transfer : transfers) {
+            if(id == transfer.getTransferId()) {
+                return transfer;
+            }
+        }
+        return null;
+    }
+
+    private boolean checkValidTransferId(List<Transfer> transfers, int id){
+        for(Transfer transfer : transfers) {
+            if(id == transfer.getTransferId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 	private void requestBucks() {
-		// TODO Auto-generated method stub
-		
+        List<User> tenmoUsers = userService.findAll();
+        viewListOfUsers(tenmoUsers);
+        boolean validSelection = false;
+        int transferId = 0;
+        while(validSelection == false) {
+            transferId = consoleService.promptForInt("Enter the ID of the user you want to request from (0 to cancel): ");
+            if(transferId == 0) {
+                return;
+            }
+            if(checkValidId(tenmoUsers, transferId)) {
+                validSelection = true;
+            }
+        }
+        BigDecimal transferAmount = consoleService.promptForBigDecimal("Please enter the amount you wish to request: ");
+        Transfer newTransfer = new Transfer();
+        if(transferAmount.compareTo(BigDecimal.valueOf(0)) > -1) {
+            newTransfer.setAccountFrom((long) transferId);
+            newTransfer.setAccountTo(currentUser.getUser().getId());
+            newTransfer.setStatusId(Transfer.TRANSFER_STATUS_PENDING);
+            newTransfer.setAmount(transferAmount);
+            newTransfer.setTypeId(Transfer.TRANSFER_TYPE_REQUEST);
+        }
+        else {
+            System.out.println("Invalid amount. Please enter a valid amount to request.");
+            return;
+        }
+        boolean completed = false;
+        completed = userService.request(newTransfer);
+        if (completed == true) {
+            System.out.println("Request has been sent.");
+        }
+        else System.out.println("Request failed to send.");
 	}
 
 }

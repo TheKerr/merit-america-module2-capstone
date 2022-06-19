@@ -28,10 +28,17 @@ public class AccountController {
     }
 
     @RequestMapping(value = "transfer", method = RequestMethod.POST)
-    public boolean transfer(@Valid @RequestBody Transfer newTransfer) {
-        return this.userDao.transferTo(newTransfer);
-    }
+    public boolean transfer(@Valid @RequestBody Transfer newTransfer) { return this.userDao.transferTo(newTransfer); }
 
     @RequestMapping(value = "transfer/history", method = RequestMethod.GET)
     public List<Transfer> getTransferHistory(@RequestParam int currentUserId) { return this.userDao.getHistory(currentUserId); }
+
+    @RequestMapping(value = "transfer/pending", method = RequestMethod.GET)
+    public List<Transfer> getPendingRequests(@RequestParam int currentUserId) { return this.userDao.getPending(currentUserId); }
+
+    @RequestMapping(value = "transfer/request", method = RequestMethod.POST)
+    public boolean request(@Valid @RequestBody Transfer newTransfer) { return this.userDao.requestBucks(newTransfer); }
+
+    @RequestMapping(value = "transfer/pending", method = RequestMethod.PUT)
+    public boolean updatePending(@Valid @RequestBody Transfer transfer) { return this.userDao.updatePending(transfer); }
 }

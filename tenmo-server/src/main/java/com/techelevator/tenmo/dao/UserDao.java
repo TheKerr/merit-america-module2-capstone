@@ -21,4 +21,10 @@ public interface UserDao {
     boolean transferTo(Transfer newTransfer);
 
     List<Transfer> getHistory(int id);
+
+    boolean requestBucks(Transfer newTransfer);
+
+    List<Transfer> getPending(int id);
+
+    boolean updatePending(Transfer transfer);
 }

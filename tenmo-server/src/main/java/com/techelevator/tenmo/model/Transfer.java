@@ -5,11 +5,11 @@ import java.math.BigDecimal;
 
 public class Transfer {
 
-    final int TRANSFER_TYPE_REQUEST = 1;
-    final int TRANSFER_TYPE_SEND = 2;
-    final int TRANSFER_STATUS_PENDING = 1;
-    final int TRANSFER_STATUS_APPROVED = 2;
-    final int TRANSFER_STATUS_REJECTED = 3;
+    public final static int TRANSFER_TYPE_REQUEST = 1;
+    public final static int TRANSFER_TYPE_SEND = 2;
+    public final static int TRANSFER_STATUS_PENDING = 1;
+    public final static int TRANSFER_STATUS_APPROVED = 2;
+    public final static int TRANSFER_STATUS_REJECTED = 3;
 
     int transferId;
     @Min(0)

@@ -1,0 +1,5 @@
+2022-06-19T16:46:31.8208857 400 : [{"timestamp":"2022-06-19T20:46:31.805+00:00","status":400,"error":"Bad Request","message":"Required int parameter 'choice' is not present","path":"/transfer/pending"}]
+2022-06-19T16:46:41.4177632 400 : [{"timestamp":"2022-06-19T20:46:41.416+00:00","status":400,"error":"Bad Request","message":"Required int parameter 'choice' is not present","path":"/transfer/pending"}]
+2022-06-19T16:49:24.470445 400 : [{"timestamp":"2022-06-19T20:49:24.458+00:00","status":400,"error":"Bad Request","message":"Required int parameter 'choice' is not present","path":"/transfer/pending"}]
+2022-06-19T16:52:44.0362625 500 : [{"timestamp":"2022-06-19T20:52:44.024+00:00","status":500,"error":"Internal Server Error","message":"Missing URI template variable 'choice' for method parameter of type int","path":"/transfer/pending"}]
+2022-06-19T16:54:30.3000134 500 : [{"timestamp":"2022-06-19T20:54:30.287+00:00","status":500,"error":"Internal Server Error","message":"Missing URI template variable 'choice' for method parameter of type int","path":"/transfer/pending"}]

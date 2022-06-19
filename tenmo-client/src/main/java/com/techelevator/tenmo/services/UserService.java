@@ -94,4 +94,49 @@ public class UserService {
         }
         return transferHistory;
     }
+
+    public boolean request(Transfer newTransfer) {
+        boolean completed = false;
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(user.getToken());
+            HttpEntity<Transfer> entity = new HttpEntity<>(newTransfer, headers);
+            ResponseEntity<Boolean> response = restTemplate.exchange(baseUrl + "transfer/request", HttpMethod.POST, entity, Boolean.class);
+            completed = response.getBody();
+        }
+        catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return completed;
+    }
+
+    public List<Transfer> getPendingRequests() {
+        List<Transfer> pendingRequests = null;
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(user.getToken());
+            HttpEntity<AuthenticatedUser> entity = new HttpEntity<>(headers);
+            ResponseEntity<Transfer[]> response = restTemplate.exchange(baseUrl + "transfer/pending?currentUserId=" + user.getUser().getId(), HttpMethod.GET, entity, Transfer[].class);
+            pendingRequests = List.of(response.getBody());
+        }
+        catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return pendingRequests;
+    }
+
+    public boolean updatePending(Transfer transfer) {
+        boolean completed = false;
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(user.getToken());
+            HttpEntity<Transfer> entity = new HttpEntity<>(transfer, headers);
+            ResponseEntity<Boolean> response = restTemplate.exchange(baseUrl + "transfer/pending", HttpMethod.PUT, entity, Boolean.class);
+            completed = response.getBody();
+        }
+        catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return completed;
+    }
 }
