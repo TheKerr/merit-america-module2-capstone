@@ -3,8 +3,8 @@
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
-        <option value="$PROJECT_DIR$/tenmo-server/pom.xml" />
         <option value="$PROJECT_DIR$/tenmo-client/pom.xml" />
+        <option value="$PROJECT_DIR$/tenmo-server/pom.xml" />
       </list>
     </option>
   </component>

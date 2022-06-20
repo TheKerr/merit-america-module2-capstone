@@ -115,6 +115,11 @@ public class App {
 	private void viewTransferHistory() {
         List<Transfer> userTransfers = userService.getTransferHistory();
         int transferId = 0;
+        if(userTransfers.size() == 0) {
+            System.out.println("No history of transfers for the current user.");
+            consoleService.pause();
+            return;
+        }
         while (true) {
             viewTransferList(userTransfers);
             System.out.println("");
@@ -143,6 +148,11 @@ public class App {
 	private void viewPendingRequests() {
         List<Transfer> pendingTransfers = userService.getPendingRequests();
         int transferId = 0;
+        if(pendingTransfers.size() == 0) {
+            System.out.println("No current pending transfers.");
+            consoleService.pause();
+            return;
+        }
         while(true) {
             consoleService.printTableHeader(new String[]{"Pending Transfers", "ID      To         Amount"});
             for(Transfer transfer : pendingTransfers) {
@@ -183,13 +193,20 @@ public class App {
     private void viewListOfUsers(List<User> tenmoUsers) {
         consoleService.printTableHeader(new String[]{"Users", "ID \t \t Name"});
         for (User user: tenmoUsers) {
-            System.out.println(user.getId() + "\t" + user.getUsername());
+            if(user.getId() != currentUser.getUser().getId()) {
+                System.out.println(user.getId() + "\t" + user.getUsername());
+            }
         }
         consoleService.printShortBar();
     }
 
 	private void sendBucks() {
         List<User> tenmoUsers = userService.findAll();
+        if(tenmoUsers.size() == 1) {
+            System.out.println("No other users to send Bucks to.");
+            consoleService.pause();
+            return;
+        }
         viewListOfUsers(tenmoUsers);
         boolean validSelection = false;
         int transferId = 0;
@@ -256,6 +273,11 @@ public class App {
 
 	private void requestBucks() {
         List<User> tenmoUsers = userService.findAll();
+        if(tenmoUsers.size() == 1) {
+            System.out.println("No other users to request Bucks from.");
+            consoleService.pause();
+            return;
+        }
         viewListOfUsers(tenmoUsers);
         boolean validSelection = false;
         int transferId = 0;
