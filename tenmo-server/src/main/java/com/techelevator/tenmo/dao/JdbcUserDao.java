@@ -91,6 +91,7 @@ public class JdbcUserDao implements UserDao {
         throw new UserIdNotFoundException(id + "is not a valid user id.");
     }
 
+    // Creates a new transfer and updates both account balances
     @Override
     public boolean transferTo(Transfer newTransfer) throws UserIdNotFoundException {
         String sqlInsertTransfer = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (" + Transfer.TRANSFER_TYPE_SEND + ", " + Transfer.TRANSFER_STATUS_APPROVED + ", " +
@@ -107,11 +108,13 @@ public class JdbcUserDao implements UserDao {
         return true;
     }
 
+    // Gets a current list of transfers that checks for the user as either a recipient or sender
     @Override
     public List<Transfer> getHistory(int id) throws UserIdNotFoundException {
         List<Transfer> transferHistory = new ArrayList<>();
         try {
-            String sql = "SELECT transfer_id, transfer_type_id, transfer_status_id, amount, from_account.account_id AS from_id, to_account.account_id AS to_id, to_user.username AS to_name, from_user.username AS from_name\n" +
+            String sql = "SELECT transfer_id, transfer_type_id, transfer_status_id, amount, from_account.account_id AS from_id, \n" +
+                    "to_account.account_id AS to_id, to_user.username AS to_name, from_user.username AS from_name\n" +
                     "FROM transfer \n" +
                     "    JOIN account AS from_account ON transfer.account_from = from_account.account_id \n" +
                     "    JOIN tenmo_user AS from_user ON from_user.user_id = from_account.user_id \n" +
@@ -119,7 +122,8 @@ public class JdbcUserDao implements UserDao {
                     "    JOIN tenmo_user AS to_user ON to_user.user_id = to_account.user_id\n" +
                     "WHERE from_user.user_id = ? \n" +
                     "UNION \n" +
-                    "SELECT transfer_id, transfer_type_id, transfer_status_id, amount, from_account.account_id AS from_id, to_account.account_id AS to_id, to_user.username AS to_name, from_user.username AS from_name\n" +
+                    "SELECT transfer_id, transfer_type_id, transfer_status_id, amount, from_account.account_id AS from_id, \n" +
+                    "to_account.account_id AS to_id, to_user.username AS to_name, from_user.username AS from_name\n" +
                     "FROM transfer \n" +
                     "    JOIN account AS from_account ON transfer.account_from = from_account.account_id \n" +
                     "    JOIN tenmo_user AS from_user ON from_user.user_id = from_account.user_id \n" +
@@ -139,6 +143,7 @@ public class JdbcUserDao implements UserDao {
         return transferHistory;
     }
 
+    // Creates a transfer, but does not adjust any balances
     @Override
     public boolean requestBucks(Transfer newTransfer) {
         String sqlRequestTransfer = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (" + Transfer.TRANSFER_TYPE_REQUEST + ", " + Transfer.TRANSFER_STATUS_PENDING + ", " +
@@ -152,6 +157,7 @@ public class JdbcUserDao implements UserDao {
         return true;
     }
 
+    // Retrieves all transfers with the status of pending
     @Override
     public List<Transfer> getPending(int id) {
         List<Transfer> pendingRequests = new ArrayList<>();
@@ -173,6 +179,7 @@ public class JdbcUserDao implements UserDao {
         return pendingRequests;
     }
 
+    // Updates the transfer based upon the user's choice
     @Override
     public boolean updatePending(Transfer transfer) {
         String sqlUpdateStatus = "UPDATE transfer SET transfer_status_id = ? WHERE transfer_id = ?";

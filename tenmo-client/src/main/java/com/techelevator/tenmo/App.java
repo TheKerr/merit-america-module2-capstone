@@ -94,13 +94,14 @@ public class App {
             consoleService.pause();
         }
     }
-
+    // Prints out the formatted current user balance
 	private void viewCurrentBalance() {
         System.out.println("Your current balance is: ");
         BigDecimal balance = userService.getBalance();
         System.out.println(currency.format(balance));
 	}
 
+    // Prints out a table of transfers
     private void viewTransferList(List<Transfer> transfer) {
         consoleService.printTableHeader(new String[]{"Transfers", "ID      From/To      Status     Amount"});
         for(Transfer transfers : transfer) {
@@ -112,6 +113,7 @@ public class App {
         }
     }
 
+    // Prints out the transfer history of the current user if it exists
 	private void viewTransferHistory() {
         List<Transfer> userTransfers = userService.getTransferHistory();
         int transferId = 0;
@@ -128,6 +130,7 @@ public class App {
             if(transferId == 0) {
                 break;
             }
+            // Prints the details of the selected transfer
             for(Transfer transfer : userTransfers) {
                 if(transfer.getTransferId() == transferId) {
                     System.out.println("");
@@ -145,9 +148,11 @@ public class App {
         }
 	}
 
+    // Prints out a list of the pending requests for the current user to approve/reject if there are any
 	private void viewPendingRequests() {
         List<Transfer> pendingTransfers = userService.getPendingRequests();
         int transferId = 0;
+        // If no transfers are currently pending for the current user, this will print and exit
         if(pendingTransfers.size() == 0) {
             System.out.println("No current pending transfers.");
             consoleService.pause();
@@ -167,6 +172,7 @@ public class App {
             int choice = 0;
             Transfer pendingTransfer = getTransferById(pendingTransfers, transferId);
             if(pendingTransfer != null) {
+                // Prompts for user approval/rejection for chosen pending transfer
                 System.out.println("1: Approve");
                 System.out.println("2: Reject");
                 System.out.println("0: Don't approve or reject");
@@ -177,6 +183,7 @@ public class App {
                     System.out.println("Invalid selection, please try again.");
                 }
                 else {
+                    // Status ID is updated by adding 1 to the choice entry to reach the desired status (Approve = 2, Reject = 3)
                     pendingTransfer.setStatusId(choice + 1);
                     boolean success = userService.updatePending(pendingTransfer);
                     if (success) {
@@ -192,6 +199,7 @@ public class App {
 
     private void viewListOfUsers(List<User> tenmoUsers) {
         consoleService.printTableHeader(new String[]{"Users", "ID \t \t Name"});
+        // Prints out all users except for the current user
         for (User user: tenmoUsers) {
             if(user.getId() != currentUser.getUser().getId()) {
                 System.out.println(user.getId() + "\t" + user.getUsername());
@@ -202,6 +210,7 @@ public class App {
 
 	private void sendBucks() {
         List<User> tenmoUsers = userService.findAll();
+        // If current user is the only user to exist, will inform that no one else is available to receive Bucks
         if(tenmoUsers.size() == 1) {
             System.out.println("No other users to send Bucks to.");
             consoleService.pause();
@@ -221,12 +230,13 @@ public class App {
         }
         BigDecimal transferAmount = consoleService.promptForBigDecimal("Please enter the amount you wish to transfer: ");
         Transfer newTransfer = new Transfer();
-        if(userService.getBalance().compareTo(transferAmount) > -1 && transferAmount.compareTo(BigDecimal.valueOf(0)) > -1) {
+        // Makes sure that the current user has enough money to send and that the amount being sent is greater than 0
+        if(userService.getBalance().compareTo(transferAmount) > -1 && transferAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
             newTransfer.setAccountFrom(currentUser.getUser().getId());
             newTransfer.setAccountTo((long) transferId);
-            newTransfer.setStatusId(2);
+            newTransfer.setStatusId(Transfer.TRANSFER_STATUS_APPROVED);
             newTransfer.setAmount(transferAmount);
-            newTransfer.setTypeId(2);
+            newTransfer.setTypeId(Transfer.TRANSFER_TYPE_SEND);
         }
         else {
             System.out.println("Invalid amount. Please enter a valid amount to transfer.");
@@ -240,6 +250,7 @@ public class App {
         else System.out.println("Transfer has failed.");
 	}
 
+    // Makes sure the ID entered is not the current user, and also exists in the current pool of existing users
     private boolean checkValidId(List<User> tenmoUsers, int id){
         if (id == currentUser.getUser().getId()) {
             System.out.println("Invalid user, please enter a different id.");
@@ -262,17 +273,9 @@ public class App {
         return null;
     }
 
-    private boolean checkValidTransferId(List<Transfer> transfers, int id){
-        for(Transfer transfer : transfers) {
-            if(id == transfer.getTransferId()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 	private void requestBucks() {
         List<User> tenmoUsers = userService.findAll();
+        // Will always be at least 1 user
         if(tenmoUsers.size() == 1) {
             System.out.println("No other users to request Bucks from.");
             consoleService.pause();
@@ -292,7 +295,8 @@ public class App {
         }
         BigDecimal transferAmount = consoleService.promptForBigDecimal("Please enter the amount you wish to request: ");
         Transfer newTransfer = new Transfer();
-        if(transferAmount.compareTo(BigDecimal.valueOf(0)) > -1) {
+        // Checks that the requested amount is greater than 0
+        if(transferAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
             newTransfer.setAccountFrom((long) transferId);
             newTransfer.setAccountTo(currentUser.getUser().getId());
             newTransfer.setStatusId(Transfer.TRANSFER_STATUS_PENDING);
