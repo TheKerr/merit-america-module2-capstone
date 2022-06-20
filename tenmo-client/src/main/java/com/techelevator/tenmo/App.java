@@ -102,10 +102,7 @@ public class App {
 	}
 
     private void viewTransferList(List<Transfer> transfer) {
-        System.out.println("-------------------------------------------");
-        System.out.println("Transfers");
-        System.out.println("ID      From/To      Status     Amount");
-        System.out.println("-------------------------------------------");
+        consoleService.printTableHeader(new String[]{"Transfers", "ID      From/To      Status     Amount"});
         for(Transfer transfers : transfer) {
             System.out.print(transfers.getTransferId() + "  \t");
             if(transfers.getFromName().equals(currentUser.getUser().getUsername())) {
@@ -129,9 +126,7 @@ public class App {
             for(Transfer transfer : userTransfers) {
                 if(transfer.getTransferId() == transferId) {
                     System.out.println("");
-                    System.out.println("---------------------------");
-                    System.out.println("Transfer Details");
-                    System.out.println("---------------------------");
+                    consoleService.printTableHeader(new String[]{"Transfer Details"});
                     System.out.println("ID: " + transfer.getTransferId());
                     System.out.println("From: " + transfer.getFromName());
                     System.out.println("To: " + transfer.getToName());
@@ -149,10 +144,7 @@ public class App {
         List<Transfer> pendingTransfers = userService.getPendingRequests();
         int transferId = 0;
         while(true) {
-            System.out.println("-----------------------------------");
-            System.out.println("Pending Transfers");
-            System.out.println("ID      To         Amount");
-            System.out.println("-----------------------------------");
+            consoleService.printTableHeader(new String[]{"Pending Transfers", "ID      To         Amount"});
             for(Transfer transfer : pendingTransfers) {
                 System.out.print(transfer.getTransferId() +" \t" + transfer.getToName()+ "\t \t   " + currency.format(transfer.getAmount()));
                 System.out.println("");
@@ -168,7 +160,7 @@ public class App {
                 System.out.println("1: Approve");
                 System.out.println("2: Reject");
                 System.out.println("0: Don't approve or reject");
-                System.out.println("------------------------------");
+                consoleService.printShortBar();
                 choice = consoleService.promptForInt("Please choose an option: ");
                 System.out.println("");
                 if(choice > 2 || choice < 0) {
@@ -189,14 +181,11 @@ public class App {
 	}
 
     private void viewListOfUsers(List<User> tenmoUsers) {
-        System.out.println("----------------------");
-        System.out.println("Users");
-        System.out.println("ID \t \t Name");
-        System.out.println("----------------------");
+        consoleService.printTableHeader(new String[]{"Users", "ID \t \t Name"});
         for (User user: tenmoUsers) {
             System.out.println(user.getId() + "\t" + user.getUsername());
         }
-        System.out.println("-----------");
+        consoleService.printShortBar();
     }
 
 	private void sendBucks() {

@@ -88,4 +88,20 @@ public class ConsoleService {
         System.out.println("An error occurred. Check the log for details.");
     }
 
+    private void printLineBar() {
+        System.out.println("-------------------------------------------");
+    }
+
+    public void printShortBar() {
+        System.out.println("-----------");
+    }
+
+    public void printTableHeader(String[] headers) {
+        printLineBar();
+        for(int i = 0; i < headers.length; i++) {
+            System.out.println(headers[i]);
+        }
+        printLineBar();
+    }
+
 }
