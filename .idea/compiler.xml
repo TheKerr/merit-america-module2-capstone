@@ -6,8 +6,8 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="m02-capstone-server" />
         <module name="m02-capstone-client" />
+        <module name="m02-capstone-server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
