@@ -89,7 +89,7 @@ public class ConsoleService {
     }
 
     private void printLineBar() {
-        System.out.println("-------------------------------------------");
+        System.out.println("----------------------------------------------------");
     }
 
     public void printShortBar() {

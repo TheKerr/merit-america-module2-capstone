@@ -103,13 +103,12 @@ public class App {
 
     // Prints out a table of transfers
     private void viewTransferList(List<Transfer> transfer) {
-        consoleService.printTableHeader(new String[]{"Transfers", "ID      From/To      Status     Amount"});
+        consoleService.printTableHeader(new String[]{"Transfers", String.format("%-6s\t%-15s\t\t%-8s\t%12s","ID","From/To","Status","Amount")});
         for(Transfer transfers : transfer) {
-            System.out.print(transfers.getTransferId() + "  \t");
-            if(transfers.getFromName().equals(currentUser.getUser().getUsername())) {
-                System.out.print("To: " + transfers.getToName() + "  \t " + transfers.getStatusName() + "  \t" + currency.format(transfers.getAmount()) + "\n");
-            }
-            else System.out.print("From: " + transfers.getFromName() + "  \t " + transfers.getStatusName() + "  \t" + currency.format(transfers.getAmount()) + "\n");
+            System.out.printf("%-6d\t%-15s\t%-8s\t%12s%n", transfers.getTransferId(),
+                    (transfers.getFromName().equals(currentUser.getUser().getUsername())) ? "To: \t" + transfers.getToName() : "From: \t" + transfers.getFromName(),
+                    transfers.getStatusName(),
+                    currency.format(transfers.getAmount()));
         }
     }
 
@@ -157,9 +156,9 @@ public class App {
             return;
         }
         while(true) {
-            consoleService.printTableHeader(new String[]{"Pending Transfers", "ID      To         Amount"});
+            consoleService.printTableHeader(new String[]{"Pending Transfers", String.format("%-6s\t%-15s\t%12s", "ID", "To", "Amount")});
             for(Transfer transfer : pendingTransfers) {
-                System.out.print(transfer.getTransferId() +" \t" + transfer.getToName()+ "\t \t   " + currency.format(transfer.getAmount()));
+                System.out.printf("%-6d\t%-15s\t%12s%n", transfer.getTransferId(), transfer.getToName(), currency.format(transfer.getAmount()));
                 System.out.println("");
             }
             System.out.println("");
@@ -196,11 +195,11 @@ public class App {
 	}
 
     private void viewListOfUsers(List<User> tenmoUsers) {
-        consoleService.printTableHeader(new String[]{"Users", "ID \t \t Name"});
+        consoleService.printTableHeader(new String[]{"Users", String.format("%-6s\t%-15s","ID", "Name")});
         // Prints out all users except for the current user
         for (User user: tenmoUsers) {
             if(user.getId() != currentUser.getUser().getId()) {
-                System.out.println(user.getId() + "\t" + user.getUsername());
+                System.out.printf("%-6d\t%-15s%n", user.getId(), user.getUsername());
             }
         }
         consoleService.printShortBar();
