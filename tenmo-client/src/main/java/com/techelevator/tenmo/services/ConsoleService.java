@@ -104,4 +104,19 @@ public class ConsoleService {
         printLineBar();
     }
 
+    public int transferUpdateMenu() {
+        int choice = 0;
+        System.out.println("1: Approve");
+        System.out.println("2: Reject");
+        System.out.println("0: Don't approve or reject");
+        printShortBar();
+        choice = promptForInt("Please choose an option: ");
+        System.out.println("");
+        if(choice > 2 || choice < 0) {
+            System.out.println("Invalid selection, please try again.");
+            return 0;
+        }
+        return choice;
+    }
+
 }

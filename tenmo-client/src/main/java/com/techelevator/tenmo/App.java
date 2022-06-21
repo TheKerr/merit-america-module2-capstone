@@ -170,18 +170,16 @@ public class App {
             Transfer pendingTransfer = getTransferById(pendingTransfers, transferId);
             if(pendingTransfer != null) {
                 // Prompts for user approval/rejection for chosen pending transfer
-                System.out.println("1: Approve");
-                System.out.println("2: Reject");
-                System.out.println("0: Don't approve or reject");
-                consoleService.printShortBar();
-                choice = consoleService.promptForInt("Please choose an option: ");
-                System.out.println("");
-                if(choice > 2 || choice < 0) {
-                    System.out.println("Invalid selection, please try again.");
-                }
-                else {
-                    // Status ID is updated by adding 1 to the choice entry to reach the desired status (Approve = 2, Reject = 3)
-                    pendingTransfer.setStatusId(choice + 1);
+                choice = consoleService.transferUpdateMenu();
+
+                if (choice > 0) {
+                    final int APPROVE = 1;
+                    //if approving, we need to check against the available balance
+                    if (choice == APPROVE && userService.getBalance().compareTo(pendingTransfer.getAmount()) == -1) {
+                        System.out.println("Not enough balance to approve transfer");
+                        break;
+                    }
+                    pendingTransfer.setStatusId((choice == APPROVE) ? Transfer.TRANSFER_STATUS_APPROVED : Transfer.TRANSFER_STATUS_REJECTED);
                     boolean success = userService.updatePending(pendingTransfer);
                     if (success) {
                         System.out.println("Transfer has been updated.");

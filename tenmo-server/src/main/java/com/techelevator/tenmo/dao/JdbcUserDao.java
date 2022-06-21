@@ -188,6 +188,10 @@ public class JdbcUserDao implements UserDao {
                 jdbcTemplate.update(sqlUpdateStatus, transfer.getStatusId(), transfer.getTransferId());
             }
             else if(transfer.getStatusId() == Transfer.TRANSFER_STATUS_APPROVED) {
+                //check for available balance first
+                BigDecimal balance = jdbcTemplate.queryForObject("SELECT balance FROM account WHERE account_id = ?", BigDecimal.class, transfer.getAccountFrom());
+                if (balance.compareTo(transfer.getAmount()) < 0) { return false; }
+                //update the balances
                 String sqlTransferOut = "UPDATE account SET balance = (SELECT balance - ? FROM account WHERE account_id = ?) WHERE account_id = ?";
                 String sqlTransferIn = "UPDATE account SET balance = (SELECT balance + ? FROM account WHERE account_id = ?) WHERE account_id = ?";
                 jdbcTemplate.update(sqlUpdateStatus, transfer.getStatusId(), transfer.getTransferId());
