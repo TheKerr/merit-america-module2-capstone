@@ -28,7 +28,7 @@ public class AccountController {
     }
 
     @RequestMapping(value = "/account/getAll", method = RequestMethod.GET)
-    public List<User> getTenmoUsers(@RequestParam long currentUserId) {
+    public List<User> getTenmoUsers() {
         return this.userDao.findAll();
     }
 

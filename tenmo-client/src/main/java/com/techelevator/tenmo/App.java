@@ -119,7 +119,6 @@ public class App {
         int transferId = 0;
         if(userTransfers.size() == 0) {
             System.out.println("No history of transfers for the current user.");
-            consoleService.pause();
             return;
         }
         while (true) {
@@ -155,7 +154,6 @@ public class App {
         // If no transfers are currently pending for the current user, this will print and exit
         if(pendingTransfers.size() == 0) {
             System.out.println("No current pending transfers.");
-            consoleService.pause();
             return;
         }
         while(true) {
@@ -213,7 +211,6 @@ public class App {
         // If current user is the only user to exist, will inform that no one else is available to receive Bucks
         if(tenmoUsers.size() == 1) {
             System.out.println("No other users to send Bucks to.");
-            consoleService.pause();
             return;
         }
         viewListOfUsers(tenmoUsers);
@@ -279,7 +276,6 @@ public class App {
         // Will always be at least 1 user
         if(tenmoUsers.size() == 1) {
             System.out.println("No other users to request Bucks from.");
-            consoleService.pause();
             return;
         }
         viewListOfUsers(tenmoUsers);

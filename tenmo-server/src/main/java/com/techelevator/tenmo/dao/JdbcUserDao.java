@@ -38,10 +38,10 @@ public class JdbcUserDao implements UserDao {
     @Override
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT user_id, username, password_hash FROM tenmo_user;";
+        String sql = "SELECT user_id, username FROM tenmo_user;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
         while(results.next()) {
-            User user = mapRowToUser(results);
+            User user = mapRowToUser(results, false);
             users.add(user);
         }
         return users;
@@ -52,7 +52,7 @@ public class JdbcUserDao implements UserDao {
         String sql = "SELECT user_id, username, password_hash FROM tenmo_user WHERE username ILIKE ?;";
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, username);
         if (rowSet.next()){
-            return mapRowToUser(rowSet);
+            return mapRowToUser(rowSet, true);
         }
         throw new UsernameNotFoundException("User " + username + " was not found.");
     }
@@ -203,13 +203,13 @@ public class JdbcUserDao implements UserDao {
     }
 
 
-    private User mapRowToUser(SqlRowSet rs) {
+    private User mapRowToUser(SqlRowSet rs, Boolean includePassword) {
         User user = new User();
         user.setId(rs.getLong("user_id"));
         user.setUsername(rs.getString("username"));
-        user.setPassword(rs.getString("password_hash"));
         user.setActivated(true);
         user.setAuthorities("USER");
+        if (includePassword) { user.setPassword(rs.getString("password_hash")); }
         return user;
     }
 

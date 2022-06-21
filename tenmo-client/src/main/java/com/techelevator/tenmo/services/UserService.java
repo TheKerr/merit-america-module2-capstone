@@ -56,7 +56,7 @@ public class UserService {
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(user.getToken());
             HttpEntity<AuthenticatedUser> entity = new HttpEntity<>(headers);
-            ResponseEntity<User[]> response = restTemplate.exchange(baseUrl + "account/getAll?currentUserId=" + user.getUser().getId(), HttpMethod.GET, entity, User[].class);
+            ResponseEntity<User[]> response = restTemplate.exchange(baseUrl + "account/getAll", HttpMethod.GET, entity, User[].class);
             allUsers = List.of(response.getBody());
         }
         catch (RestClientResponseException | ResourceAccessException e) {
