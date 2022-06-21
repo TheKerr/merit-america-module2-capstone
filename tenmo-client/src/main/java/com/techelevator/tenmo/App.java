@@ -156,6 +156,7 @@ public class App {
             return;
         }
         while(true) {
+            // Formats table with printf to keep consistent
             consoleService.printTableHeader(new String[]{"Pending Transfers", String.format("%-6s\t%-15s\t%12s", "ID", "To", "Amount")});
             for(Transfer transfer : pendingTransfers) {
                 System.out.printf("%-6d\t%-15s\t%12s%n", transfer.getTransferId(), transfer.getToName(), currency.format(transfer.getAmount()));
