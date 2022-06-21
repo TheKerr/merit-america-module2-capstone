@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.List;
 
 @PreAuthorize("isAuthenticated()")
@@ -18,8 +19,12 @@ public class AccountController {
     public AccountController(UserDao userDao) { this.userDao = userDao; }
 
     @RequestMapping(value = "/account/{id}", method = RequestMethod.GET)
-    public BigDecimal getBalance(@Valid @PathVariable int id) {
-        return this.userDao.getBalance(id);
+    public BigDecimal getBalance(@Valid @PathVariable int id, Principal principal) {
+        if (id == this.userDao.findByUsername(principal.getName()).getId()) {
+            return this.userDao.getBalance(id);
+        } else {
+            return null;
+        }
     }
 
     @RequestMapping(value = "/account/getAll", method = RequestMethod.GET)
@@ -28,17 +33,46 @@ public class AccountController {
     }
 
     @RequestMapping(value = "transfer", method = RequestMethod.POST)
-    public boolean transfer(@Valid @RequestBody Transfer newTransfer) { return this.userDao.transferTo(newTransfer); }
+    public boolean transfer(@Valid @RequestBody Transfer newTransfer, Principal principal) {
+        if (newTransfer.getFromName().equals(principal.getName())) {
+            return this.userDao.transferTo(newTransfer);
+        }
+        return false;
+    }
 
     @RequestMapping(value = "transfer/history", method = RequestMethod.GET)
-    public List<Transfer> getTransferHistory(@RequestParam int currentUserId) { return this.userDao.getHistory(currentUserId); }
+    public List<Transfer> getTransferHistory(@RequestParam int currentUserId, Principal principal) {
+        if (currentUserId == this.userDao.findByUsername(principal.getName()).getId()) {
+            return this.userDao.getHistory(currentUserId);
+        } else {
+            return null;
+        }
+    }
 
     @RequestMapping(value = "transfer/pending", method = RequestMethod.GET)
-    public List<Transfer> getPendingRequests(@RequestParam int currentUserId) { return this.userDao.getPending(currentUserId); }
+    public List<Transfer> getPendingRequests(@RequestParam int currentUserId, Principal principal) {
+        if (currentUserId == this.userDao.findByUsername(principal.getName()).getId()) {
+            return this.userDao.getPending(currentUserId);
+        } else {
+            return null;
+        }
+    }
 
     @RequestMapping(value = "transfer/request", method = RequestMethod.POST)
-    public boolean request(@Valid @RequestBody Transfer newTransfer) { return this.userDao.requestBucks(newTransfer); }
+    public boolean request(@Valid @RequestBody Transfer newTransfer, Principal principal) {
+        if (newTransfer.getToName().equals(principal.getName())) {
+            return this.userDao.requestBucks(newTransfer);
+        } else {
+            return false;
+        }
+    }
 
     @RequestMapping(value = "transfer/pending", method = RequestMethod.PUT)
-    public boolean updatePending(@Valid @RequestBody Transfer transfer) { return this.userDao.updatePending(transfer); }
+    public boolean updatePending(@Valid @RequestBody Transfer transfer, Principal principal) {
+        if (transfer.getFromName().equals(principal.getName())) {
+            return this.userDao.updatePending(transfer);
+        } else {
+            return false;
+        }
+    }
 }

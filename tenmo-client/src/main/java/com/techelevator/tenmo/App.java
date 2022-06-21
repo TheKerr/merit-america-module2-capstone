@@ -233,6 +233,7 @@ public class App {
         // Makes sure that the current user has enough money to send and that the amount being sent is greater than 0
         if(userService.getBalance().compareTo(transferAmount) > -1 && transferAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
             newTransfer.setAccountFrom(currentUser.getUser().getId());
+            newTransfer.setFromName(currentUser.getUser().getUsername());
             newTransfer.setAccountTo((long) transferId);
             newTransfer.setStatusId(Transfer.TRANSFER_STATUS_APPROVED);
             newTransfer.setAmount(transferAmount);
@@ -299,6 +300,7 @@ public class App {
         if(transferAmount.compareTo(BigDecimal.valueOf(0)) > 0) {
             newTransfer.setAccountFrom((long) transferId);
             newTransfer.setAccountTo(currentUser.getUser().getId());
+            newTransfer.setToName(currentUser.getUser().getUsername());
             newTransfer.setStatusId(Transfer.TRANSFER_STATUS_PENDING);
             newTransfer.setAmount(transferAmount);
             newTransfer.setTypeId(Transfer.TRANSFER_TYPE_REQUEST);
